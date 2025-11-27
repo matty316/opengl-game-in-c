@@ -17,7 +17,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
       glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-GLuint create_vertex_buffer_objects() {
+void create_vertex_buffer_objects(GLuint *vao, GLuint *vbo, GLuint *ebo) {
   float vertices[] = {
      0.5f,  0.5f, 0.0f,  // top right
      0.5f, -0.5f, 0.0f,  // bottom right
@@ -30,17 +30,17 @@ GLuint create_vertex_buffer_objects() {
     1, 2, 3    // second triangle
   };
 
-  GLuint vbo, vao, ebo;
-  glGenVertexArrays(1, &vao);
-  glGenBuffers(1, &vbo);
-  glGenBuffers(1, &ebo);
 
-  glBindVertexArray(vao);
+  glGenVertexArrays(1, vao);
+  glGenBuffers(1, vbo);
+  glGenBuffers(1, ebo);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindVertexArray(*vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, *vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -48,23 +48,21 @@ GLuint create_vertex_buffer_objects() {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
-
-  return vao;
 }
 
-void run() {
+void init(GLFWwindow **window) {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow *window = glfwCreateWindow(width, height, "OpenGL in C", NULL, NULL);
-  if (window == NULL) {
+  *window = glfwCreateWindow(width, height, "OpenGL in C", NULL, NULL);
+  if (*window == NULL) {
     printf("Failed to create GLFW window\n");
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
-  glfwMakeContextCurrent(window);
+  glfwMakeContextCurrent(*window);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     printf("Failed to init GLAD\n");
@@ -73,16 +71,22 @@ void run() {
   }
 
   int actual_width, actual_height;
-  glfwGetFramebufferSize(window, &actual_width, &actual_height);
+  glfwGetFramebufferSize(*window, &actual_width, &actual_height);
   glViewport(0, 0, actual_width, actual_height);
 
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-  glfwSetKeyCallback(window, key_callback);
+  glfwSetFramebufferSizeCallback(*window, framebuffer_size_callback);
+  glfwSetKeyCallback(*window, key_callback);
+}
+
+void run() {
+  GLFWwindow *window;
+  init(&window);
 
   GLuint shader = create_shader("shaders/shader.vert", "shaders/shader.frag");
   use(shader);
 
-  GLuint vao = create_vertex_buffer_objects();
+  GLuint vao, vbo, ebo;
+  create_vertex_buffer_objects(&vao, &vbo, &ebo);
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.8f, 0.8f, 0.98f, 1.0f);
@@ -96,5 +100,9 @@ void run() {
     glfwPollEvents();
   }
 
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+  glDeleteBuffers(1, &ebo);
+  glDeleteProgram(shader);
   glfwTerminate();
 }

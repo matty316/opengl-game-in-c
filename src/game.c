@@ -14,7 +14,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
   printf("%d", key);
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GLFW_TRUE);
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 void create_vertex_buffer_objects(GLuint *vao, GLuint *vbo, GLuint *ebo) {
@@ -29,7 +29,6 @@ void create_vertex_buffer_objects(GLuint *vao, GLuint *vbo, GLuint *ebo) {
     0, 1, 3,   // first triangle
     1, 2, 3    // second triangle
   };
-
 
   glGenVertexArrays(1, vao);
   glGenBuffers(1, vbo);

@@ -1,8 +1,13 @@
 #include "quad.h"
+#include "cglm/util.h"
+#include "cglm/vec2.h"
+#include "cglm/vec3.h"
 #include "shader.h"
 #include "cglm/affine-pre.h"
 #include "cglm/affine.h"
 #include "cglm/mat4.h"
+#include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 void setup_quad_vao(GLuint *vao, GLuint *vbo, GLuint *ebo) {
@@ -53,6 +58,7 @@ Quad add_quad(vec3 pos, vec3 rotation, float angle, float scale) {
   memcpy(quad.rotation, rotation, sizeof(float) * 3);
   quad.angle = angle;
   quad.scale = scale;
+  glm_vec2_zero(quad.velocity);
 
   update_quad(&quad);
 
@@ -68,16 +74,31 @@ void draw_quad(Quad *quad, GLuint shader) {
 }
 
 void move_quad(Quad *quad, QuadDirection direction, float delta_time) {
-  const float accel = 0.2f;
-  if (direction == QUAD_UP)
-    quad->pos[1] += accel * delta_time;
-  if (direction == QUAD_DOWN)
-    quad->pos[1] -= accel * delta_time;
-  if (direction == QUAD_LEFT)
-    quad->pos[0] -= accel * delta_time;
-  if (direction == QUAD_RIGHT)
-    quad->pos[0] += accel * delta_time;
+  const float accel = 1.0f;
+  float damping = 0.1f;
+  vec2 velocity;
+  glm_vec2_zero(velocity);
 
+  if (direction == QUAD_UP)
+    velocity[1] += accel * delta_time;
+  if (direction == QUAD_DOWN)
+    velocity[1] -= accel * delta_time;
+  if (direction == QUAD_LEFT)
+    velocity[0] -= accel * delta_time;
+  if (direction == QUAD_RIGHT)
+    velocity[0] += accel * delta_time;
+
+  if (velocity[0] == 0.0f && velocity[1] == 0.0f) {
+    vec2 damped;
+    glm_vec2_zero(damped);
+    glm_vec2_scale(quad->velocity, fminf(1.0f / damping * delta_time, 1.0f), damped);
+    glm_vec2_sub(quad->velocity, damped, quad->velocity);
+  } else {
+    glm_vec2_copy(velocity, quad->velocity);
+  }
+
+  quad->pos[1] += quad->velocity[1];
+  quad->pos[0] += quad->velocity[0];
   update_quad(quad);
 }
 

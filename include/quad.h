@@ -9,6 +9,7 @@ typedef struct Quad {
   vec3 pos, rotation;
   float angle, scale;
   GLuint vao, vbo, ebo;
+  vec2 velocity;
 } Quad;
 
 typedef enum QuadDirection {

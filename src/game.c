@@ -82,7 +82,7 @@ void run() {
     mat4 proj;
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    float aspect = (float)width / (float) height;
+    float aspect = (float)width / (float)height;
     glm_ortho_default(aspect, proj);
     set_mat4(shader, "proj", proj);
 

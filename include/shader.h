@@ -6,5 +6,5 @@
 
 GLuint create_shader(const char *vertex_path, const char *fragment_path);
 void use(GLuint shader);
-void set_mat4(GLuint shader, const char *name, mat4 mat);
+void set_mat4(GLuint shader, const char *name, vec4 *mat);
 #endif

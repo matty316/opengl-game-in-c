@@ -30,7 +30,6 @@ void create_vertex_buffer_objects(GLuint *vao, GLuint *vbo, GLuint *ebo) {
     1, 2, 3    // second triangle
   };
 
-
   glGenVertexArrays(1, vao);
   glGenBuffers(1, vbo);
   glGenBuffers(1, ebo);

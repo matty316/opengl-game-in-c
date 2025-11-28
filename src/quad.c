@@ -1,13 +1,8 @@
 #include "quad.h"
-#include "cglm/util.h"
-#include "cglm/vec2.h"
-#include "cglm/vec3.h"
 #include "shader.h"
 #include "cglm/affine-pre.h"
 #include "cglm/affine.h"
-#include "cglm/mat4.h"
 #include <math.h>
-#include <stdio.h>
 #include <string.h>
 
 void setup_quad_vao(GLuint *vao, GLuint *vbo, GLuint *ebo) {

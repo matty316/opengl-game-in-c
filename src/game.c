@@ -3,7 +3,6 @@
 #include "quad.h"
 #include "shader.h"
 #include "common.h"
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 

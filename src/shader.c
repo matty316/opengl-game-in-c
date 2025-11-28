@@ -30,14 +30,14 @@ void check_compile_errors(GLuint shader, const char *type) {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
       glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-      printf("Failed to link program");
+      printf("Failed to link program: %s", infoLog);
       exit(EXIT_FAILURE);
     }
   } else {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
       glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-      printf("Failed to compile shader: %s", type);
+      printf("Failed to compile shader: %s, %s", type, infoLog);
       exit(EXIT_FAILURE);
     }
   }

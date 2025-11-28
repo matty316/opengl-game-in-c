@@ -1,7 +1,9 @@
 #include "game.h"
+#include "cglm/cam.h"
 #include "quad.h"
 #include "shader.h"
 #include "common.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -77,6 +79,14 @@ void run() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     use(shader);
+
+    mat4 proj;
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    float aspect = (float)width / (float) height;
+    glm_ortho_default(aspect, proj);
+    set_mat4(shader, "proj", proj);
+
     draw_quad(&quad, shader);
 
     glfwSwapBuffers(window);

@@ -1,0 +1,3 @@
+[submodule "opegl-c"]
+	path = opegl-c
+	url = git@github.com:matty316/opegl-c.git

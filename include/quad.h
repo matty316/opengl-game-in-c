@@ -10,18 +10,17 @@ typedef struct Quad {
   float angle, scale;
   GLuint vao, vbo, ebo;
   vec2 velocity;
+  struct {
+    bool forward;
+    bool backward;
+    bool left;
+    bool right;
+  } movement;
 } Quad;
-
-typedef enum QuadDirection {
-  QUAD_UP,
-  QUAD_DOWN,
-  QUAD_LEFT,
-  QUAD_RIGHT
-} QuadDirection;
 
 Quad add_quad(vec3 pos, vec3 rotation, float angle, float scale);
 void draw_quad(Quad *quad, GLuint shader);
-void move_quad(Quad *quad, QuadDirection direction, float delta_time);
+void update_quad(Quad *quad, float delta_time);
 void destroy_quad(Quad *quad);
 
 #endif

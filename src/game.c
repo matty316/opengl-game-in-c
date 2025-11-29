@@ -17,21 +17,13 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void process_actions(GLFWwindow *window, Quad *quad) {
-  double current_time = glfwGetTime();
-  float delta_time = (float)(current_time - last_time);
-  last_time = current_time;
-
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    move_quad(quad, QUAD_UP, delta_time);
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    move_quad(quad, QUAD_DOWN, delta_time);
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    move_quad(quad, QUAD_LEFT, delta_time);
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    move_quad(quad, QUAD_RIGHT, delta_time);
+  quad->movement.forward = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+  quad->movement.backward = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+  quad->movement.left = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+  quad->movement.right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
 }
 
 void init(GLFWwindow **window) {
@@ -40,7 +32,7 @@ void init(GLFWwindow **window) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  *window = glfwCreateWindow(width, height, "OpenGL in C", NULL, NULL);
+  *window = glfwCreateWindow(width, height, "OpenGL in C", glfwGetPrimaryMonitor(), NULL);
   if (*window == NULL) {
     printf("Failed to create GLFW window\n");
     glfwTerminate();
@@ -74,6 +66,13 @@ void run() {
 
   while (!glfwWindowShouldClose(window)) {
     process_actions(window, &quad);
+
+    double current_time = glfwGetTime();
+    float delta_time = (float)(current_time - last_time);
+    last_time = current_time;
+
+    update_quad(&quad, delta_time);
+
     glClearColor(0.8f, 0.8f, 0.98f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 

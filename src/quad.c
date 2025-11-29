@@ -37,7 +37,32 @@ void setup_quad_vao(GLuint *vao, GLuint *vbo, GLuint *ebo) {
   glBindVertexArray(0);
 }
 
-void update_quad(Quad *quad) {
+void update_quad(Quad *quad, float delta_time) {
+  const float accel = 2.0f;
+  float damping = 0.2f;
+  vec2 velocity;
+  glm_vec2_zero(velocity);
+
+  if (quad->movement.forward)
+    velocity[1] += accel * delta_time;
+  if (quad->movement.backward)
+    velocity[1] -= accel * delta_time;
+  if (quad->movement.left)
+    velocity[0] -= accel * delta_time;
+  if (quad->movement.right)
+    velocity[0] += accel * delta_time;
+
+  if (velocity[0] == 0.0f && velocity[1] == 0.0f) {
+    vec2 damped;
+    glm_vec2_zero(damped);
+    glm_vec2_scale(quad->velocity, fminf(1.0f / damping * delta_time, 1.0f), damped);
+    glm_vec2_sub(quad->velocity, damped, quad->velocity);
+  } else {
+    glm_vec2_copy(velocity, quad->velocity);
+  }
+
+  quad->pos[1] += quad->velocity[1];
+  quad->pos[0] += quad->velocity[0];
   glm_mat4_identity(quad->model);
   glm_translate(quad->model, quad->pos);
 
@@ -55,7 +80,18 @@ Quad add_quad(vec3 pos, vec3 rotation, float angle, float scale) {
   quad.scale = scale;
   glm_vec2_zero(quad.velocity);
 
-  update_quad(&quad);
+  glm_mat4_identity(quad.model);
+  glm_translate(quad.model, quad.pos);
+
+  glm_rotate(quad.model, quad.angle, quad.rotation);
+
+  vec3 scale_vec = {quad.scale, quad.scale, quad.scale};
+  glm_scale(quad.model, scale_vec);
+
+  quad.movement.forward = false;
+  quad.movement.backward = false;
+  quad.movement.left = false;
+  quad.movement.right = false;
 
   setup_quad_vao(&quad.vao, &quad.vbo, &quad.ebo);
 
@@ -66,35 +102,6 @@ void draw_quad(Quad *quad, GLuint shader) {
   glBindVertexArray(quad->vao);
   set_mat4(shader, "model", quad->model);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
-void move_quad(Quad *quad, QuadDirection direction, float delta_time) {
-  const float accel = 1.0f;
-  float damping = 0.1f;
-  vec2 velocity;
-  glm_vec2_zero(velocity);
-
-  if (direction == QUAD_UP)
-    velocity[1] += accel * delta_time;
-  if (direction == QUAD_DOWN)
-    velocity[1] -= accel * delta_time;
-  if (direction == QUAD_LEFT)
-    velocity[0] -= accel * delta_time;
-  if (direction == QUAD_RIGHT)
-    velocity[0] += accel * delta_time;
-
-  if (velocity[0] == 0.0f && velocity[1] == 0.0f) {
-    vec2 damped;
-    glm_vec2_zero(damped);
-    glm_vec2_scale(quad->velocity, fminf(1.0f / damping * delta_time, 1.0f), damped);
-    glm_vec2_sub(quad->velocity, damped, quad->velocity);
-  } else {
-    glm_vec2_copy(velocity, quad->velocity);
-  }
-
-  quad->pos[1] += quad->velocity[1];
-  quad->pos[0] += quad->velocity[0];
-  update_quad(quad);
 }
 
 void destroy_quad(Quad *quad) {

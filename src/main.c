@@ -2,6 +2,6 @@
 #include <stdlib.h>
 
 int main() {
-  run();
+  run(false);
   return EXIT_SUCCESS;
 }

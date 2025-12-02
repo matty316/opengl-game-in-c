@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 int main() {
-  init(true);
+  init(false, 1920, 1080);
   GLuint texture_id = load_texture("resources/Audi.png");
   run(texture_id);
   return EXIT_SUCCESS;
